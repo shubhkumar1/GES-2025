@@ -24,7 +24,9 @@ const studentSchema = new mongoose.Schema(
         session: { type: String, required: true },
         mobileNum: { type: String, required: true },
         parentNum: { type: String, required: true, unique: true },
+        parentAltNum: { type: String, required: true, unique: true },
         relation: { type: String, required: true, uppercase: true },
+        relationAltNum: { type: String, required: true, uppercase: true },
         mail: { type: String, required: true, unique: true, lowercase: true },
         gender: { type: String, required: true, uppercase: true },
         upiID: { type: String, required: true, lowercase: true },
@@ -69,7 +71,7 @@ app.get('/', (req, res) => {
 app.post('/api/registration', async (req, res) => {
     try {
 
-        const { name, rollNum, department, subject, session, mobileNum, parentNum, relation, mail, gender, upiID, paidBy, textArea } = req.body;
+        const { name, rollNum, department, subject, session, mobileNum, parentNum, parentAltNum, relation, relationAltNum, mail, gender, upiID, paidBy, textArea } = req.body;
 
         let studentName = await Student.findOne({ name });
         let studentMobileNum = await Student.findOne({ mobileNum });
@@ -109,7 +111,9 @@ app.post('/api/registration', async (req, res) => {
             session: session,
             mobileNum: mobileNum,
             parentNum: parentNum,
+            parentAltNum: parentAltNum,
             relation: relation,
+            relationAltNum: relationAltNum,
             mail: mail,
             gender: gender,
             upiID: upiID,
