@@ -34,6 +34,7 @@ const studentSchema = new mongoose.Schema(
         textArea: {type: String, required: true},
         amount: { type: String, required: true, uppercase: true },
         tshirtSize: {type: String, uppercase: true},
+        age: {type: String, required: true}
     },
     { timestamps: true }
 );
@@ -71,7 +72,7 @@ app.get('/', (req, res) => {
 app.post('/api/registration', async (req, res) => {
     try {
 
-        const { name, rollNum, department, subject, session, mobileNum, parentNum, parentAltNum, relation, relationAltNum, mail, gender, upiID, paidBy, textArea } = req.body;
+        const { name, rollNum, department, subject, session, mobileNum, parentNum, parentAltNum, relation, relationAltNum, mail, gender, upiID, paidBy, textArea, age } = req.body;
 
         let studentName = await Student.findOne({ name });
         let studentMobileNum = await Student.findOne({ mobileNum });
@@ -120,7 +121,8 @@ app.post('/api/registration', async (req, res) => {
             paidBy: paidBy, // Firstname + last 4 digit mobileNum
             textArea: textArea,
             amount: "Unpaid",
-            tshirtSize: ""
+            tshirtSize: "",
+            age: age
         })
 
         res.status(201).send({ message: "Registered successfully" });
