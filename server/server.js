@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import nodemailer from "nodemailer";
 
 const app = express();
 
@@ -20,7 +21,7 @@ const studentSchema = new mongoose.Schema(
         name: { type: String, required: true, uppercase: true },
         rollNum: { type: String, required: true, unique: true, uppercase: true },
         department: { type: String, required: true },
-        subject: {type: String, required: true, uppercase: true},
+        subject: { type: String, required: true, uppercase: true },
         session: { type: String, required: true },
         mobileNum: { type: String, required: true },
         parentNum: { type: String, required: true, unique: true },
@@ -31,10 +32,10 @@ const studentSchema = new mongoose.Schema(
         gender: { type: String, required: true, uppercase: true },
         upiID: { type: String, required: true, lowercase: true },
         paidBy: { type: String, required: true, uppercase: true },
-        textArea: {type: String, required: true},
+        textArea: { type: String, required: true },
         amount: { type: String, required: true, uppercase: true },
-        tshirtSize: {type: String, uppercase: true},
-        age: {type: String, required: true}
+        tshirtSize: { type: String, uppercase: true },
+        age: { type: String, required: true }
     },
     { timestamps: true }
 );
@@ -135,7 +136,7 @@ app.post('/api/registration', async (req, res) => {
 app.get('/api/admin/search-data/:id1/:id2', async (req, res) => {
     // const { searchInput } = req.body;
     // console.log(req.params.id1);
-    if(req.params.id1 === 'UPI ID'){
+    if (req.params.id1 === 'UPI ID') {
         Student.find(
             { upiID: req.params.id2 }
         ).then((student) => {
@@ -144,7 +145,7 @@ app.get('/api/admin/search-data/:id1/:id2', async (req, res) => {
             res.status(500).send({ message: "Server problem" })
         })
     }
-    if(req.params.id1 === 'Roll No.'){
+    if (req.params.id1 === 'Roll No.') {
         Student.find(
             { rollNum: req.params.id2 }
         ).then((student) => {
@@ -153,7 +154,7 @@ app.get('/api/admin/search-data/:id1/:id2', async (req, res) => {
             res.status(500).send({ message: "Server problem" })
         })
     }
-    if(req.params.id1 === 'Mobile No.'){
+    if (req.params.id1 === 'Mobile No.') {
         Student.find(
             { mobileNum: req.params.id2 }
         ).then((student) => {
@@ -173,9 +174,38 @@ app.get('/api/admin/search-data/:id1/:id2', async (req, res) => {
 
 // Update student data
 app.put('/api/admin/update-data', async (req, res) => {
+
+    const { code } = req.body;
+
+    let transport = nodemailer.createTransport({
+        service: 'gmail',
+        secure: true,
+        port: 465,
+        auth: {
+            user: 'contactamazingfacts107@gmail.com',
+            pass: 'rxwsmzjbrtoaityc'
+        }
+    })
+
+    let student = await Student.find({ rollNum: code });
+    
+    let stuMail = student[0].mail;
+    let stuName = student[0].name;
+    
+    console.log(stuMail);
+    let mailOptions = {
+        from: "contactamazingfacts107@gmail.com",
+        to: stuMail,
+        subject: "🎉 Your Registration for GES-2025 is Confirmed! 🎉",
+        html: `<h1>DEAR ${stuName},</h1><p>We are thrilled to confirm your registration for the Global Entrepreneurship Summit 2025 (GES-2025)! </p><p>Get ready to embark on an incredible journey filled with innovation, inspiration, and networking opportunities. This year&apos;s summit promises to be our most exciting yet, with a lineup of world-renowned speakers, cutting-edge workshops, and unparalleled opportunities to connect with fellow entrepreneurs from around the globe.</p><h3>Event Details:</h3><ul><li>Date: 7th Feb to 9th Feb</li><li>Location: IIT Kharagpur</li></ul><p>Stay tuned with us. We can&apos;t wait to see you at GES-2025 and witness the magic of entrepreneurship unfold!</p><h3>Best regards,</h3><h3>Shubham Kumar</h3><h3>BCA Department</h3><h3>Marwari College, Ranchi</h3>`
+    }
     try {
-        const { code } = req.body;
+        // const { code } = req.body;
         await Student.updateOne({ rollNum: code }, { amount: "PAID" });
+
+        let info = await transport.sendMail(mailOptions);
+        console.log('Email sent: ' + info.response);
+
         res.send({ message: "update successfully" })
     } catch (err) {
         res.send(err);
@@ -185,10 +215,10 @@ app.put('/api/admin/update-data', async (req, res) => {
 // delete student data
 app.delete('/api/admin/delete/:id', async (req, res) => {
     try {
-        await Student.findOneAndDelete({rollNum : req.params.id})
-        res.send({message: "Deleted successfully"});
+        await Student.findOneAndDelete({ rollNum: req.params.id })
+        res.send({ message: "Deleted successfully" });
     } catch (err) {
-        res.send({message: "Server error"});
+        res.send({ message: "Server error" });
     }
 })
 
@@ -206,7 +236,7 @@ app.get('/api/students', async (req, res) => {
 
 app.get('/api/studentsdata', async (req, res) => {
     Student.find(
-        {amount: 'unpaid'}
+        { amount: 'unpaid' }
     ).then((student) => {
         res.send(student);
     }).catch((err) => {
@@ -239,18 +269,18 @@ app.post('/api/admin/login', async (req, res) => {
 
         const admin = await Admin.findOne({ A_mail });
 
-        if (!admin  || admin.A_password !== A_password || admin.A_name !== A_code) {
+        if (!admin || admin.A_password !== A_password || admin.A_name !== A_code) {
             return res.status(500).send({ message: "Invalid login details" });
         }
-        
 
-            // res.send(admin);
-            res.status(200).send({ message: "Login successfully" });
+
+        // res.send(admin);
+        res.status(200).send({ message: "Login successfully" });
 
         // res.status(200).send({message: "Login successful!"});
-            
 
-    
+
+
         // if (admin && A_code === admin.A_name && A_password === admin.A_password) {
         //     res.status(200).send({ message: "Login successfully" });
         // }
