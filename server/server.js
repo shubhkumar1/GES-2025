@@ -223,15 +223,24 @@ app.delete('/api/admin/delete/:id', async (req, res) => {
 })
 
 // get student data for everyone
+// app.get('/api/students', async (req, res) => {
+//     Student.find(
+//         { amount: 'paid' }
+//     ).then((student) => {
+//         res.send(student);
+//     }).catch((err) => {
+//         res.status(500).send({ message: "Server problem" })
+//     })
+// })
+
 app.get('/api/students', async (req, res) => {
-    Student.find(
-        { amount: 'paid' }
-    ).then((student) => {
-        res.send(student);
-    }).catch((err) => {
-        res.status(500).send({ message: "Server problem" })
-    })
-})
+    try {
+        const students = await Student.find({ amount: 'paid' }).sort({ updatedAt: 1 }); // Sort by date in descending order
+        res.send(students);
+    } catch (err) {
+        res.status(500).send({ message: "Server problem" });
+    }
+});
 
 
 app.get('/api/studentsdata', async (req, res) => {
