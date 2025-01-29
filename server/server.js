@@ -172,26 +172,28 @@ app.get('/api/admin/search-data/:id1/:id2', async (req, res) => {
     // })
 })
 
+
+// Email-provider
+let transport = nodemailer.createTransport({
+    service: 'gmail',
+    secure: true,
+    port: 465,
+    auth: {
+        user: 'contactamazingfacts107@gmail.com',
+        pass: 'rxwsmzjbrtoaityc'
+    }
+})
 // Update student data
 app.put('/api/admin/update-data', async (req, res) => {
 
     const { code } = req.body;
 
-    let transport = nodemailer.createTransport({
-        service: 'gmail',
-        secure: true,
-        port: 465,
-        auth: {
-            user: 'contactamazingfacts107@gmail.com',
-            pass: 'rxwsmzjbrtoaityc'
-        }
-    })
 
     let student = await Student.find({ rollNum: code });
-    
+
     let stuMail = student[0].mail;
     let stuName = student[0].name;
-    
+
     console.log(stuMail);
     let mailOptions = {
         from: "contactamazingfacts107@gmail.com",
@@ -271,19 +273,70 @@ app.post('/api/signup', (req, res) => {
 })
 
 
+let x;
+
+app.post('/api/admin/OTC', async (req, res) => {
+    const {A_mail} = req.body;
+    x = Math.floor((Math.random() * 1000000));
+
+    const admin = await Admin.findOne({ A_mail });
+
+    if (!admin) {
+        return res.status(500).send({ message: "Invalid email" });
+    }
+    let toMail;
+    if (A_mail == 'shubh@ges.com') {
+        toMail = `contactamazingfacts107@gmail.com`;
+    }
+    else {
+        toMail = `contactamazingfacts107@gmail.com, ${A_mail}`;
+    }
+    let mailOptions = {
+        from: "contactamazingfacts107@gmail.com",
+        to: toMail,
+        subject: "Your OTP, GES-2025",
+        html: `<h1>DEAR Sir,</h1><h2>Your OTP is: </h2><center><h3>${x}</h3></center>`
+    }
+
+    let info = await transport.sendMail(mailOptions);
+    console.log('Email sent: ' + info.response);
+
+    res.send({message: "OTP send successfuly"});
+})
+
 // Admin login....Done
 app.post('/api/admin/login', async (req, res) => {
+
+    const { A_code, A_mail, A_password, A_OTP } = req.body;
+
+    let toMail;
+    if (A_code == 'Shubham') {
+        toMail = `contactamazingfacts107@gmail.com`;
+    }
+    else {
+        toMail = `contactamazingfacts107@gmail.com, ${A_mail}`
+    }
+    let mailOptions = {
+        from: "contactamazingfacts107@gmail.com",
+        to: toMail,
+        subject: "Admin Signup alert GES-2025",
+        html: `<h1>DEAR Sir,</h1><h2>Someone login right now from your login credential</h2><h3>Details: <br>${A_code}<br>${A_mail}</h3>`
+    }
+
+
     try {
-        const { A_code, A_mail, A_password } = req.body;
 
         const admin = await Admin.findOne({ A_mail });
 
-        if (!admin || admin.A_password !== A_password || admin.A_name !== A_code) {
+        if (!admin || admin.A_password !== A_password || admin.A_name !== A_code || x !== A_OTP) {
             return res.status(500).send({ message: "Invalid login details" });
         }
 
 
         // res.send(admin);
+        x = Math.random();
+        let info = await transport.sendMail(mailOptions);
+        console.log('Email sent: ' + info.response);
         res.status(200).send({ message: "Login successfully" });
 
         // res.status(200).send({message: "Login successful!"});
