@@ -304,7 +304,7 @@ app.post('/api/admin/OTC', async (req, res) => {
     res.send({message: "OTP send successfuly"});
 })
 
-console.log(x);
+
 // Admin login....Done
 app.post('/api/admin/login', async (req, res) => {
 
@@ -327,14 +327,6 @@ app.post('/api/admin/login', async (req, res) => {
 
     try {
 
-        console.log(x);
-        console.log(A_code);
-        console.log(A_mail);
-        console.log(A_password);
-        console.log(A_OTP);
-
-        console.log(typeof(x))
-        console.log(typeof(Number(A_OTP)))
         const admin = await Admin.findOne({ A_mail });
 
         if (!admin || admin.A_password !== A_password || admin.A_name !== A_code || x !== Number(A_OTP) ) {
