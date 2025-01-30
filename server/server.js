@@ -19,7 +19,7 @@ mongoose.connect('mongodb+srv://contactamazingfacts107:IXqOwMFNcHCzcyXm@cluster0
 const studentSchema = new mongoose.Schema(
     {
         name: { type: String, required: true, uppercase: true },
-        rollNum: { type: String, required: true, unique: true, uppercase: true },
+        rollNum: { type: String, required: true, uppercase: true },
         department: { type: String, required: true },
         subject: { type: String, required: true, uppercase: true },
         session: { type: String, required: true },
@@ -273,11 +273,11 @@ app.post('/api/signup', (req, res) => {
 })
 
 
-let x;
+var x;
+x = Math.floor((Math.random() * 1000000));
 
 app.post('/api/admin/OTC', async (req, res) => {
     const {A_mail} = req.body;
-    x = Math.floor((Math.random() * 1000000));
 
     const admin = await Admin.findOne({ A_mail });
 
@@ -304,13 +304,14 @@ app.post('/api/admin/OTC', async (req, res) => {
     res.send({message: "OTP send successfuly"});
 })
 
+console.log(x);
 // Admin login....Done
 app.post('/api/admin/login', async (req, res) => {
 
     const { A_code, A_mail, A_password, A_OTP } = req.body;
 
     let toMail;
-    if (A_code == 'Shubham') {
+    if (A_mail == 'shubh@ges.com') {
         toMail = `contactamazingfacts107@gmail.com`;
     }
     else {
@@ -326,15 +327,23 @@ app.post('/api/admin/login', async (req, res) => {
 
     try {
 
+        console.log(x);
+        console.log(A_code);
+        console.log(A_mail);
+        console.log(A_password);
+        console.log(A_OTP);
+
+        console.log(typeof(x))
+        console.log(typeof(Number(A_OTP)))
         const admin = await Admin.findOne({ A_mail });
 
-        if (!admin || admin.A_password !== A_password || admin.A_name !== A_code || x !== A_OTP) {
+        if (!admin || admin.A_password !== A_password || admin.A_name !== A_code || x !== Number(A_OTP) ) {
             return res.status(500).send({ message: "Invalid login details" });
         }
 
 
         // res.send(admin);
-        x = Math.random();
+        x = Math.floor((Math.random() * 1000000));
         let info = await transport.sendMail(mailOptions);
         console.log('Email sent: ' + info.response);
         res.status(200).send({ message: "Login successfully" });
