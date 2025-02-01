@@ -163,6 +163,24 @@ app.get('/api/admin/search-data/:id1/:id2', async (req, res) => {
             res.status(500).send({ message: "Server problem" })
         })
     }
+    if (req.params.id1 === 'Gender') {
+        Student.find(
+            { gender: req.params.id2 }
+        ).then((student) => {
+            res.send(student);
+        }).catch((err) => {
+            res.status(500).send({ message: "Server problem" })
+        })
+    }
+    if (req.params.id1 === 'Department') {
+        Student.find(
+            { department: req.params.id2 }
+        ).then((student) => {
+            res.send(student);
+        }).catch((err) => {
+            res.status(500).send({ message: "Server problem" })
+        })
+    }
     // Student.find(
     //     { rollNum: req.params.id2 }
     // ).then((student) => {
@@ -205,8 +223,38 @@ app.put('/api/admin/update-data', async (req, res) => {
         // const { code } = req.body;
         await Student.updateOne({ rollNum: code }, { amount: "PAID" });
 
+        // for department update
+        // await Student.updateOne({ rollNum: code }, { department: "B.Sc. BioTech" });
+
         let info = await transport.sendMail(mailOptions);
         console.log('Email sent: ' + info.response);
+
+        res.send({ message: "update successfully" })
+    } catch (err) {
+        res.send(err);
+    }
+})
+
+
+app.put('/api/update-size', async (req, res) => {
+
+    const { mobileNum, gender, depart, tshirtSize } = req.body;
+
+    let student = await Student.find({ mobileNum: mobileNum });
+
+    if (!student) {
+        return res.status(500).send({ message: "Invalid mobile no." });
+    }
+
+    if (!student || student[0].gender !== gender || student[0].department !== depart) {
+        return res.status(500).send({ message: "Invalid details" });
+    }
+    
+    try {
+
+        // const { code } = req.body;
+        await Student.updateOne({ mobileNum: mobileNum }, { tshirtSize: tshirtSize });
+
 
         res.send({ message: "update successfully" })
     } catch (err) {
