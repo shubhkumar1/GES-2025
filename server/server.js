@@ -195,7 +195,8 @@ app.get('/api/admin/search-data/:id1/:id2', async (req, res) => {
 
 // Email-provider
 let transport = nodemailer.createTransport({
-    service: 'smtp.gmail.com',
+    service: 'gmail',
+    host: 'smtp.gmail.com',
     port: 465,
     secure: true,
     auth: {
@@ -387,7 +388,7 @@ app.post('/api/admin/login', async (req, res) => {
 
         // res.send(admin);
         x = Math.floor((Math.random() * 1000000));
-        // let info = await transport.sendMail(mailOptions);    
+        let info = await transport.sendMail(mailOptions);    
         console.log('Email sent: ' + info.response);
         res.status(200).send({ message: "Login successfully" });
 
