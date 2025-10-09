@@ -7,13 +7,8 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: '*', // or use '*' for public APIs
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
-}));
+app.use(cors());
 
-app.options('*', cors());
 
 
 // mongoose.connect('mongodb://localhost:27017/student')
@@ -392,7 +387,7 @@ app.post('/api/admin/login', async (req, res) => {
 
         // res.send(admin);
         x = Math.floor((Math.random() * 1000000));
-        // let info = await transport.sendMail(mailOptions);    working on it for semding mail
+        // let info = await transport.sendMail(mailOptions);    
         console.log('Email sent: ' + info.response);
         res.status(200).send({ message: "Login successfully" });
 
