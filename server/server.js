@@ -330,7 +330,7 @@ app.post('/api/signup', (req, res) => {
 
 var x;
 x = Math.floor((Math.random() * 1000000));
-
+console.log(x);
 
 app.post('/api/admin/OTC', async (req, res) => {
     const {A_mail} = req.body;
