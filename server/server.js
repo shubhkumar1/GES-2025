@@ -392,7 +392,7 @@ app.post('/api/admin/login', async (req, res) => {
 
         // res.send(admin);
         x = Math.floor((Math.random() * 1000000));
-        let info = await transport.sendMail(mailOptions);
+        // let info = await transport.sendMail(mailOptions);    working on it for semding mail
         console.log('Email sent: ' + info.response);
         res.status(200).send({ message: "Login successfully" });
 
