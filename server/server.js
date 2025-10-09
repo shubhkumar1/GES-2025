@@ -7,7 +7,11 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+  origin: 'https://mcrcell.netlify.app', // or use '*' for public APIs
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // mongoose.connect('mongodb://localhost:27017/student')
 mongoose.connect('mongodb+srv://contactamazingfacts107:IXqOwMFNcHCzcyXm@cluster0.qjqrn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
