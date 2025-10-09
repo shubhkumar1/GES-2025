@@ -198,7 +198,7 @@ let transport = nodemailer.createTransport({
     port: 465,
     auth: {
         user: 'contactamazingfacts107@gmail.com',
-        pass: 'rxwsmzjbrtoaityc'
+        pass: 'bxksvecqrrzuqjxl'
     }
 })
 // Update student data
