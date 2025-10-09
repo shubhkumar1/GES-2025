@@ -13,6 +13,9 @@ app.use(cors({
   credentials: true
 }));
 
+app.options('*', cors());
+
+
 // mongoose.connect('mongodb://localhost:27017/student')
 mongoose.connect('mongodb+srv://contactamazingfacts107:IXqOwMFNcHCzcyXm@cluster0.qjqrn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
     .then(() => console.log("MongoDB is connected"))
