@@ -1,22 +1,20 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import nodemailer from "nodemailer";
+// import nodemailer from "nodemailer";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: 'https://mcrcell.netlify.app', 
+    origin: 'http://localhost:5173', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
 
-
-
 // mongoose.connect('mongodb://localhost:27017/student')
-mongoose.connect('mongodb+srv://contactamazingfacts107:IXqOwMFNcHCzcyXm@cluster0.qjqrn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+mongoose.connect('mongodb+srv://contactamazingfacts107_db_user:ZlkHasSkwcs0C6ad@ges.djkzceu.mongodb.net/?appName=GES')
     .then(() => console.log("MongoDB is connected"))
     .catch((err) => console.error(err));
 
@@ -40,7 +38,7 @@ const studentSchema = new mongoose.Schema(
         paidBy: { type: String, required: true, uppercase: true },
         textArea: { type: String, required: true },
         amount: { type: String, required: true, uppercase: true },
-        tshirtSize: { type: String, uppercase: true },
+        tshirtSize: { type: String, required: true, uppercase: true },
         age: { type: String, required: true }
     },
     { timestamps: true }
@@ -79,7 +77,7 @@ app.get('/', (req, res) => {
 app.post('/api/registration', async (req, res) => {
     try {
 
-        const { name, rollNum, department, subject, session, mobileNum, parentNum, parentAltNum, relation, relationAltNum, mail, gender, upiID, paidBy, textArea, age } = req.body;
+        const { name, rollNum, department, subject, session, mobileNum, parentNum, parentAltNum, relation, relationAltNum, mail, gender, upiID, paidBy, textArea, age, tshirtSize } = req.body;
 
         let studentName = await Student.findOne({ name });
         let studentMobileNum = await Student.findOne({ mobileNum });
@@ -128,7 +126,7 @@ app.post('/api/registration', async (req, res) => {
             paidBy: paidBy, // Firstname + last 4 digit mobileNum
             textArea: textArea,
             amount: "Unpaid",
-            tshirtSize: "",
+            tshirtSize: tshirtSize,
             age: age
         })
 
@@ -187,6 +185,15 @@ app.get('/api/admin/search-data/:id1/:id2', async (req, res) => {
             res.status(500).send({ message: "Server problem" })
         })
     }
+    if (req.params.id1 === 'Subject') {
+        Student.find(
+            { subject: req.params.id2 }
+        ).then((student) => {
+            res.send(student);
+        }).catch((err) => {
+            res.status(500).send({ message: "Server problem" })
+        })
+    }
     // Student.find(
     //     { rollNum: req.params.id2 }
     // ).then((student) => {
@@ -198,43 +205,46 @@ app.get('/api/admin/search-data/:id1/:id2', async (req, res) => {
 
 
 // Email-provider
-let transport = nodemailer.createTransport({
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: 'contactamazingfacts107@gmail.com',
-        pass: 'bxksvecqrrzuqjxl'
-    }
-})
+// let transport = nodemailer.createTransport({
+//     service: 'gmail',
+//     host: 'smtp.gmail.com',
+//     secure: true,
+//     port: 465,
+//     auth: {
+//         user: 'contactamazingfacts107@gmail.com',
+//         pass: 'bxksvecqrrzuqjxl'
+//     }
+// })
+
+//-----------------------------------------------------------
 // Update student data
 app.put('/api/admin/update-data', async (req, res) => {
 
     const { code } = req.body;
 
 
-    let student = await Student.find({ rollNum: code });
+    // let student = await Student.find({ rollNum: code });
 
-    let stuMail = student[0].mail;
-    let stuName = student[0].name;
+    // let stuMail = student[0].mail;
+    // let stuName = student[0].name;
 
-    console.log(stuMail);
-    let mailOptions = {
-        from: "contactamazingfacts107@gmail.com",
-        to: stuMail,
-        subject: "🎉 Your Registration for GES-2025 is Confirmed! 🎉",
-        html: `<h1>DEAR ${stuName},</h1><p>We are thrilled to confirm your registration for the Global Entrepreneurship Summit 2025 (GES-2025)! </p><p>Get ready to embark on an incredible journey filled with innovation, inspiration, and networking opportunities. This year&apos;s summit promises to be our most exciting yet, with a lineup of world-renowned speakers, cutting-edge workshops, and unparalleled opportunities to connect with fellow entrepreneurs from around the globe.</p><h3>Event Details:</h3><ul><li>Date: 7th Feb to 9th Feb</li><li>Location: IIT Kharagpur</li></ul><p>Stay tuned with us. We can&apos;t wait to see you at GES-2025 and witness the magic of entrepreneurship unfold!</p><h3>Best regards,</h3><h3>Shubham Kumar</h3><h3>BCA Department</h3><h3>Marwari College, Ranchi</h3>`
-    }
+    // console.log(stuMail);
+    // let mailOptions = {
+    //     from: "contactamazingfacts107@gmail.com",
+    //     to: stuMail,
+    //     subject: "🎉 Your Registration for GES-2025 is Confirmed! 🎉",
+    //     html: `<h1>DEAR ${stuName},</h1><p>We are thrilled to confirm your registration for the Global Entrepreneurship Summit 2025 (GES-2025)! </p><p>Get ready to embark on an incredible journey filled with innovation, inspiration, and networking opportunities. This year&apos;s summit promises to be our most exciting yet, with a lineup of world-renowned speakers, cutting-edge workshops, and unparalleled opportunities to connect with fellow entrepreneurs from around the globe.</p><h3>Event Details:</h3><ul><li>Date: 7th Feb to 9th Feb</li><li>Location: IIT Kharagpur</li></ul><p>Stay tuned with us. We can&apos;t wait to see you at GES-2025 and witness the magic of entrepreneurship unfold!</p><h3>Best regards,</h3><h3>Shubham Kumar</h3><h3>BCA Department</h3><h3>Marwari College, Ranchi</h3>`
+    // }
     try {
         // const { code } = req.body;
         await Student.updateOne({ rollNum: code }, { amount: "PAID" });
+        // await Student.updateOne({ rollNum: code }, { subject: "COMPUTER" });
 
         // for department update
         // await Student.updateOne({ rollNum: code }, { department: "B.Sc. BioTech" });
 
-        let info = await transport.sendMail(mailOptions);
-        console.log('Email sent: ' + info.response);
+        // let info = await transport.sendMail(mailOptions);
+        // console.log('Email sent: ' + info.response);
 
         res.send({ message: "update successfully" })
     } catch (err) {
@@ -243,31 +253,31 @@ app.put('/api/admin/update-data', async (req, res) => {
 })
 
 
-app.put('/api/update-size', async (req, res) => {
+// app.put('/api/update-size', async (req, res) => {
 
-    const { mobileNum, gender, depart, tshirtSize } = req.body;
+//     const { mobileNum, gender, depart, tshirtSize } = req.body;
 
-    let student = await Student.find({ mobileNum: mobileNum });
+//     let student = await Student.find({ mobileNum: mobileNum });
 
-    if (!student) {
-        return res.status(500).send({ message: "Invalid mobile no." });
-    }
+//     if (!student) {
+//         return res.status(500).send({ message: "Invalid mobile no." });
+//     }
 
-    if (!student || student[0].gender !== gender || student[0].department !== depart) {
-        return res.status(500).send({ message: "Invalid details" });
-    }
-    
-    try {
+//     if (!student || student[0].gender !== gender || student[0].department !== depart) {
+//         return res.status(500).send({ message: "Invalid details" });
+//     }
 
-        // const { code } = req.body;
-        await Student.updateOne({ mobileNum: mobileNum }, { tshirtSize: tshirtSize });
+//     try {
+
+//         // const { code } = req.body;
+//         await Student.updateOne({ mobileNum: mobileNum }, { tshirtSize: tshirtSize });
 
 
-        res.send({ message: "update successfully" })
-    } catch (err) {
-        res.send(err);
-    }
-})
+//         res.send({ message: "update successfully" })
+//     } catch (err) {
+//         res.send(err);
+//     }
+// })
 
 // delete student data
 app.delete('/api/admin/delete/:id', async (req, res) => {
@@ -280,15 +290,15 @@ app.delete('/api/admin/delete/:id', async (req, res) => {
 })
 
 // get student data for everyone
-// app.get('/api/students', async (req, res) => {
-//     Student.find(
-//         { amount: 'paid' }
-//     ).then((student) => {
-//         res.send(student);
-//     }).catch((err) => {
-//         res.status(500).send({ message: "Server problem" })
-//     })
-// })
+app.get('/api/students', async (req, res) => {
+    Student.find(
+        { amount: 'paid' }
+    ).then((student) => {
+        res.send(student);
+    }).catch((err) => {
+        res.status(500).send({ message: "Server problem" })
+    })
+})
 
 app.get('/api/students', async (req, res) => {
     try {
@@ -321,6 +331,12 @@ app.post('/api/signup', (req, res) => {
             A_password: A_password
         })
 
+        // Admin.create({
+        //     A_name: "Shubh",
+        //     A_mail: "shub@ges2026.com",
+        //     A_password: "6vuMZE75#"
+        // })
+
         res.send('Admin register successfully');
     } catch (err) {
         res.send(err)
@@ -330,11 +346,10 @@ app.post('/api/signup', (req, res) => {
 
 var x;
 x = Math.floor((Math.random() * 1000000));
-console.log(x);
 
 app.post('/api/admin/OTC', async (req, res) => {
-    const {A_mail} = req.body;
-    console.log(x);
+    const { A_mail } = req.body;
+
     const admin = await Admin.findOne({ A_mail });
 
     if (!admin) {
@@ -347,17 +362,18 @@ app.post('/api/admin/OTC', async (req, res) => {
     else {
         toMail = `contactamazingfacts107@gmail.com, ${A_mail}`;
     }
-    let mailOptions = {
-        from: "contactamazingfacts107@gmail.com",
-        to: toMail,
-        subject: "Your OTP, GES-2025",
-        html: `<h1>DEAR Sir,</h1><h2>Your OTP is: </h2><center><h3>${x}</h3></center>`
-    }
+    // let mailOptions = {
+    //     from: "contactamazingfacts107@gmail.com",
+    //     to: toMail,
+    //     subject: "Your OTP, GES-2025",
+    //     html: `<h1>DEAR Sir,</h1><h2>Your OTP is: </h2><center><h3>${x}</h3></center>`
+    // }
 
-    let info = await transport.sendMail(mailOptions);
-    console.log('Email sent: ' + info.response);
+    // let info = await transport.sendMail(mailOptions);
+    // console.log('Email sent: ' + info.response);
+    console.log(x);
 
-    res.send({message: "OTP send successfuly"});
+    res.send({ message: "OTP send successfuly" });
 })
 
 
@@ -373,27 +389,27 @@ app.post('/api/admin/login', async (req, res) => {
     else {
         toMail = `contactamazingfacts107@gmail.com, ${A_mail}`
     }
-    let mailOptions = {
-        from: "contactamazingfacts107@gmail.com",
-        to: toMail,
-        subject: "Admin Signup alert GES-2025",
-        html: `<h1>DEAR Sir,</h1><h2>Someone login right now from your login credential</h2><h3>Details: <br>${A_code}<br>${A_mail}</h3>`
-    }
+    // let mailOptions = {
+    //     from: "contactamazingfacts107@gmail.com",
+    //     to: toMail,
+    //     subject: "Admin Signup alert GES-2025",
+    //     html: `<h1>DEAR Sir,</h1><h2>Someone login right now from your login credential</h2><h3>Details: <br>${A_code}<br>${A_mail}</h3>`
+    // }
 
 
     try {
 
         const admin = await Admin.findOne({ A_mail });
 
-        if (!admin || admin.A_password !== A_password || admin.A_name !== A_code || x !== Number(A_OTP) ) {
+        if (!admin || admin.A_password !== A_password || admin.A_name !== A_code || x !== Number(A_OTP)) {
             return res.status(500).send({ message: "Invalid login details" });
         }
 
 
         // res.send(admin);
         x = Math.floor((Math.random() * 1000000));
-        let info = await transport.sendMail(mailOptions);    
-        console.log('Email sent: ' + info.response);
+        // let info = await transport.sendMail(mailOptions);
+        // console.log('Email sent: ' + info.response);
         res.status(200).send({ message: "Login successfully" });
 
         // res.status(200).send({message: "Login successful!"});
